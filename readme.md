@@ -1,6 +1,6 @@
 # Mortgage Calculator slack app
 
-Mortgage Calculator slack app, generated with the botkit starter. 
+Mortgage Calculator slack app, generated with the [botkit](https://botkit.ai/) starter. 
 
 Calculates monthly mortgage payments controlled by slack
 

@@ -5,15 +5,16 @@
 module.exports = function (controller) {
 
     controller.hears(/mortgage/, ['message', 'direct_message'], async function (bot, message) {
-        console.log(message)
-
         // parses message for variables
-        const numbers = message.incoming_message.match(/[-+]?[0-9]*\.?[0-9]+/g) // regex match extracts ints and floats
-            .forEach(match => Number.parseFloat(match))
+        const matches = message.text.match(/[-+]?[0-9]*\.?[0-9]+/g) // regex match extracts ints and floats
+        let numbers
+        if (matches) {
+            numbers = matches.map(match => Number.parseFloat(match))
+        }
 
-        let response_message;
+        let response_message
 
-        if (numbers.length < 3) {
+        if (!numbers || numbers.length < 3) {
             response_message = "Please provide a price (e.g., 500000), interest (e.g., 0.03) and a term in years (e.g., 30)."
         } else {
             const price = numbers[0]
@@ -21,10 +22,10 @@ module.exports = function (controller) {
             const term = numbers[2] 
 
             // does math for mortgage - assumes 3.00 interest on 30 year loan
-            const monthly_payment = price / (1/interest - 1/(interest*(1+interest)**term)) / 12
+            let monthly_payment = price / (1/interest - 1/(interest*(1+interest)**term)) / 12
+            monthly_payment = Math.round(monthly_payment)
 
-            response_message = "Your montly payment based on\n price: " + price + "\n interest: "
-                + interest + "\n term: " + term + "\n is <b>" + monthly_payment + "</b> per month"
+            response_message = `Your montly payment based on\nprice: ${price}\ninterest: ${interest}\n term: ${term}\n is *${monthly_payment}* per month`
         }
         //format block kit
         const blockKitReply = {
@@ -39,7 +40,7 @@ module.exports = function (controller) {
             ]
         }
 
-        await bot.reply(message, blockKitReply);
+        await bot.reply(message, blockKitReply)
     });
 
 }
